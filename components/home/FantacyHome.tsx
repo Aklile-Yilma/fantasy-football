@@ -14,8 +14,8 @@ const FantacyHome = () => {
     const [gameTypes, setGameTypes] = useState<Map<string, Set<string>>>(new Map());
     const [slateNames, setSlateNames] = useState<Map<string, Set<string>>>(new Map());
     const [players, setPlayers] = useState<Map<string, DfsSlatePlayer[]>>(new Map());
+    const [currentPlayer, setCurrentPlayer] = useState<DfsSlatePlayer>();
     const [currentPlayersKey, setPlayersKey] = useState('');
-    const [currentPlayerId, setPlayerId] = useState(1);
     const [selectedOptions, setSelectedoptions] = useState({
         "operator": null,
         "gameType": null,
@@ -92,8 +92,8 @@ const FantacyHome = () => {
         }
     }
 
-    const handlePlayerChange = (id: number) => {
-        setPlayerId(id);
+    const handlePlayerChange = (player: DfsSlatePlayer) => {
+        setCurrentPlayer(player);
     }
 
     console.log("players", players.get(currentPlayersKey) || [])
@@ -129,7 +129,7 @@ const FantacyHome = () => {
 
             <div className="grid grid-cols-4">
                 <PlayersTable players={players.get(currentPlayersKey) || []} handlePlayerChange={handlePlayerChange}/>
-                <Player player={players.get(currentPlayersKey)?.[currentPlayerId]}/>
+                <Player player={currentPlayer}/>
             </div>
 
         </div>
