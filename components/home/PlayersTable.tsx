@@ -8,9 +8,10 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 interface PlayersTableProps {
     players: DfsSlatePlayer[]
     handlePlayerChange: (player: DfsSlatePlayer) => void
+    current_player: DfsSlatePlayer
 }
 
-const PlayersTable = ({players, handlePlayerChange}: PlayersTableProps) => {
+const PlayersTable = ({current_player, players, handlePlayerChange}: PlayersTableProps) => {
     const rowsPerPageOptions = [8, 15, 30];
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(8);
@@ -56,7 +57,7 @@ const PlayersTable = ({players, handlePlayerChange}: PlayersTableProps) => {
                 <tbody>
                     {
                         players?.slice(indexofFirstItem, indexOfLastItem)?.map((player, index) => (
-                            <tr onClick={() => handlePlayerChange(player)} key={index} className={`border-b bg-secondary border-gray-700 cursor-pointer hover:bg-primary`}>
+                            <tr onClick={() => handlePlayerChange(player)} key={index} className={`border-b ${player.playerId == current_player.playerId ? 'bg-[#807B1B]': 'bg-secondary'} border-gray-700 cursor-pointer hover:bg-primary`}>
                                 <td className="px-6 py-4">
                                     {player?.operatorPlayerName}
                                 </td>

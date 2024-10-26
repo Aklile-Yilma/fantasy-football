@@ -8,6 +8,12 @@ import PlayersTable from "./PlayersTable";
 import Player from "./Player";
 import UISelect from "../common/UISelect";
 
+type SelectedOptions = {
+    operator?: string | null;
+    gameType?: string | null;
+    slateName?: string | null;
+};
+
 const FantacyHome = () => {
     const [data, setData] = useState<SlateData[]>();
     const [loading, setLoading] = useState(false);
@@ -17,10 +23,10 @@ const FantacyHome = () => {
     const [players, setPlayers] = useState<Map<string, DfsSlatePlayer[]>>(new Map());
     const [currentPlayer, setCurrentPlayer] = useState<DfsSlatePlayer>();
     const [currentPlayersKey, setPlayersKey] = useState('');
-    const [selectedOptions, setSelectedoptions] = useState({
-        "operator": null,
-        "gameType": null,
-        "slateName": null
+    const [selectedOptions, setSelectedoptions] = useState<SelectedOptions>({
+        operator: null,
+        gameType: null,
+        slateName: null
     })
 
     useEffect(() => {
@@ -76,28 +82,59 @@ const FantacyHome = () => {
         setGameTypes(updatedGameTypes);
         setSlateNames(updatedSlateNames);
         setPlayers(updatedPlayers);
+
+        // auto select
+        const firstOperator = Array.from(updatedOperators)[0];
+        const firstGameType = firstOperator ? Array.from(updatedGameTypes.get(firstOperator) || [])[0] : '';
+        const firstSlateName = firstGameType ? Array.from(updatedSlateNames.get(firstGameType) || [])[0] : '';
+    
+        setSelectedoptions({
+            operator: firstOperator,
+            gameType: firstGameType,
+            slateName: firstSlateName
+        });
+
+        const playersKey = `${firstGameType}_${firstSlateName}`;
+        setPlayersKey(playersKey)
+        setCurrentPlayer(updatedPlayers?.get(playersKey)?.[0])
+
     }, [data])
+
 
     const handleSelectedOption = (type: string, value: string) => {
         if(value) {
-            setSelectedoptions((prev) => ({
-                ...prev,
-                [type]: value
-            }))
-            if(type == 'gameType' || type == 'slateName') {
-                const gameType = type == 'gameType' ? value : selectedOptions?.gameType;
-                const slateName = type == 'slateName' ? value : selectedOptions?.slateName;
-                const playersKey = `${gameType}_${slateName}`;
-                setPlayersKey(playersKey);
+            let operator
+            let gameType;
+            let slateName;
+            if(type == 'operator') {
+                operator = value as string;
+                gameType = Array.from(gameTypes.get(operator) || [])?.[0];
+                slateName =  Array.from(slateNames.get(gameType) || [])?.[0];
+            } else if(type == 'gameType') {
+                operator = selectedOptions?.operator
+                gameType = value;
+                slateName = Array.from(slateNames.get(gameType) || [])?.[0];
+   
+            } else if (type == 'slateName') {
+                operator = selectedOptions?.operator 
+                gameType = selectedOptions?.gameType
+                slateName = value;
             }
+
+            const playersKey = `${gameType}_${slateName}`;
+            setPlayersKey(playersKey);
+            setSelectedoptions({
+                operator,
+                gameType,
+                slateName
+            })
+            setCurrentPlayer(players?.get(playersKey)?.[0])
         }
     }
 
     const handlePlayerChange = (player: DfsSlatePlayer) => {
         setCurrentPlayer(player);
     }
-
-    console.log("players", players.get(currentPlayersKey) || [])
 
     return (
         <div className="w-full">
@@ -126,13 +163,13 @@ const FantacyHome = () => {
                     handleSelectedOption={handleSelectedOption}
                     placeholder="Select Slate Name"
                     type="slateName"
-                    value={selectedOptions?.gameType}
+                    value={selectedOptions?.slateName}
                     key={"slate-names"}
                 />
            </div>
 
             <div className="grid grid-cols-4">
-                <PlayersTable players={players.get(currentPlayersKey) || []} handlePlayerChange={handlePlayerChange}/>
+                <PlayersTable current_player={currentPlayer!} players={players.get(currentPlayersKey) || []} handlePlayerChange={handlePlayerChange}/>
                 <Player player={currentPlayer}/>
             </div>
 
