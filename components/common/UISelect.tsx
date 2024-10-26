@@ -7,12 +7,16 @@ interface UISelectProps {
     placeholder?: string,
     width: string,
     label?: string,
-    defaultValue: any,
     type: string,
     value: any
 }
 
-const UISelect = ({options, handleSelectedOption, placeholder, width, label, defaultValue, type, value}: UISelectProps) => {
+const UISelect = ({options, handleSelectedOption, placeholder, width, label, type, value}: UISelectProps) => {
+
+    const formattedOptions = options?.map((option: any) => ({
+        label: option,
+        value: option
+    }));
 
     return <div className="flex gap-2 items-center">
         <label className="capitalize text-base">{label}</label>
@@ -20,11 +24,10 @@ const UISelect = ({options, handleSelectedOption, placeholder, width, label, def
             theme={customTheme}
             className={width}
             id="game-type"
-            options={options ? options?.map((key: string) => ({label: key, value: key})) : []}
+            options={formattedOptions ? formattedOptions : []}
             onChange={(selectedOption: any) => handleSelectedOption(type, selectedOption?.value)}
             placeholder={placeholder}
-            defaultValue={{label: defaultValue, value: defaultValue}}
-            value={value}
+            value={formattedOptions?.find((option) => option.value === (value)) || null}
     />
 </div>
 }

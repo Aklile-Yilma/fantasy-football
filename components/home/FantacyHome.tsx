@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import Select from "react-select";
 import PlayersTable from "./PlayersTable";
 import Player from "./Player";
+import UISelect from "../common/UISelect";
 
 const FantacyHome = () => {
     const [data, setData] = useState<SlateData[]>();
@@ -101,29 +102,32 @@ const FantacyHome = () => {
     return (
         <div className="w-full">
            <div className="p-6 bg-secondary flex flex-row items-center justify-center gap-10">
-                <Select 
-                    className="w-56"
-                    theme={customTheme}
-                    id="operator-type"
-                    options={Array.from(operators?.keys())?.map((key: string) => ({label: key, value: key}))}
-                    onChange={(selectedOption: any) => handleSelectedOption("operator", selectedOption?.value)}
+                <UISelect 
+                    width="w-56"
+                    options={Array.from(operators?.keys())}
+                    handleSelectedOption={handleSelectedOption}
                     placeholder="Select operator"
+                    type="operator"
+                    value={selectedOptions?.operator}
+                    key={"operator"}
                 />
-                <Select 
-                    theme={customTheme}
-                    className="w-56"
-                    id="game-type"
-                    options={selectedOptions?.operator ? Array.from(gameTypes?.get(selectedOptions.operator) || [])?.map((key: string) => ({label: key, value: key})) : []}
-                    onChange={(selectedOption: any) => handleSelectedOption("gameType", selectedOption?.value)}
+                <UISelect 
+                    width="w-56"
+                    options={Array.from(gameTypes?.get(selectedOptions?.operator || '') || [])}
+                    handleSelectedOption={handleSelectedOption}
                     placeholder="Select Game Type"
+                    type="gameType"
+                    value={selectedOptions?.gameType}
+                    key={"game-type"}
                 />
-                <Select 
-                    className="w-56"
-                    theme={customTheme}
-                    id="slate-names"
-                    options={selectedOptions?.gameType ? Array.from(slateNames?.get(selectedOptions.gameType) || [])?.map((key: string) => ({label: key, value: key})) : []}
-                    onChange={(selectedOption: any) => handleSelectedOption("slateName", selectedOption?.value)}
+                <UISelect 
+                    width="w-56"
+                    options={Array.from(slateNames?.get(selectedOptions.gameType || '') || [])}
+                    handleSelectedOption={handleSelectedOption}
                     placeholder="Select Slate Name"
+                    type="slateName"
+                    value={selectedOptions?.gameType}
+                    key={"slate-names"}
                 />
            </div>
 
