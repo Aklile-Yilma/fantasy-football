@@ -7,6 +7,7 @@ import Select from "react-select";
 import PlayersTable from "./PlayersTable";
 import Player from "./Player";
 import UISelect from "../common/UISelect";
+import Loading from "../common/Loading";
 
 type SelectedOptions = {
     operator?: string | null;
@@ -16,7 +17,7 @@ type SelectedOptions = {
 
 const FantacyHome = () => {
     const [data, setData] = useState<SlateData[]>();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [operators, setOperators] = useState<Set<string>>(new Set());
     const [gameTypes, setGameTypes] = useState<Map<string, Set<string>>>(new Map());
     const [slateNames, setSlateNames] = useState<Map<string, Set<string>>>(new Map());
@@ -31,7 +32,6 @@ const FantacyHome = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true);
             try {
                 const response = await fetch('/data.json');
                 const responseData = await response.json();
@@ -138,41 +138,48 @@ const FantacyHome = () => {
 
     return (
         <div className="w-full">
-           <div className="p-6 bg-secondary flex flex-row items-center justify-center gap-10">
-                <UISelect 
-                    width="w-56"
-                    options={Array.from(operators?.keys())}
-                    handleSelectedOption={handleSelectedOption}
-                    placeholder="Select operator"
-                    type="operator"
-                    value={selectedOptions?.operator}
-                    key={"operator"}
-                />
-                <UISelect 
-                    width="w-56"
-                    options={Array.from(gameTypes?.get(selectedOptions?.operator || '') || [])}
-                    handleSelectedOption={handleSelectedOption}
-                    placeholder="Select Game Type"
-                    type="gameType"
-                    value={selectedOptions?.gameType}
-                    key={"game-type"}
-                />
-                <UISelect 
-                    width="w-56"
-                    options={Array.from(slateNames?.get(selectedOptions.gameType || '') || [])}
-                    handleSelectedOption={handleSelectedOption}
-                    placeholder="Select Slate Name"
-                    type="slateName"
-                    value={selectedOptions?.slateName}
-                    key={"slate-names"}
-                />
-           </div>
-
-            <div className="grid grid-cols-4">
-                <PlayersTable current_player={currentPlayer!} players={players.get(currentPlayersKey) || []} handlePlayerChange={handlePlayerChange}/>
-                <Player player={currentPlayer}/>
-            </div>
-
+            {
+                loading ? (
+                    <Loading />
+                ) : (
+                    <div>
+                        <div className="p-6 bg-secondary flex flex-row items-center justify-center gap-10">
+                        <UISelect 
+                            width="w-56"
+                            options={Array.from(operators?.keys())}
+                            handleSelectedOption={handleSelectedOption}
+                            placeholder="Select operator"
+                            type="operator"
+                            value={selectedOptions?.operator}
+                            key={"operator"}
+                        />
+                        <UISelect 
+                            width="w-56"
+                            options={Array.from(gameTypes?.get(selectedOptions?.operator || '') || [])}
+                            handleSelectedOption={handleSelectedOption}
+                            placeholder="Select Game Type"
+                            type="gameType"
+                            value={selectedOptions?.gameType}
+                            key={"game-type"}
+                        />
+                        <UISelect 
+                            width="w-56"
+                            options={Array.from(slateNames?.get(selectedOptions.gameType || '') || [])}
+                            handleSelectedOption={handleSelectedOption}
+                            placeholder="Select Slate Name"
+                            type="slateName"
+                            value={selectedOptions?.slateName}
+                            key={"slate-names"}
+                        />
+                </div>
+        
+                    <div className="grid grid-cols-4">
+                        <PlayersTable current_player={currentPlayer!} players={players.get(currentPlayersKey) || []} handlePlayerChange={handlePlayerChange}/>
+                        <Player player={currentPlayer}/>
+                    </div>
+                </div>
+                )
+            }
         </div>
     )
 }
